@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: My Article Listener
- * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, a draggable seek bar, a replay button, and per-post on/off control.
- * Version: 1.8
+ * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, a draggable seek bar, and per-post on/off control.
+ * Version: 1.9
  * Author: You
  * License: GPL-2.0+
  */
@@ -163,9 +163,6 @@ function mal_player_html( $content ) {
 			<svg id="mal-ic-play" width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5-9-5.5z"/></svg>
 			<svg id="mal-ic-pause" width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="display:none"><path d="M4 2h3v12H4zM9 2h3v12H9z"/></svg>
 		</button>
-		<button id="mal-replay" type="button" aria-label="Replay from start">
-			<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-		</button>
 		<div class="mal-mid">
 			<div class="mal-toprow">
 				<span class="mal-label">' . esc_html( $o['label'] ) . '</span>
@@ -196,9 +193,6 @@ function mal_assets() {
 		#mal-toggle{width:44px;height:44px;flex:0 0 44px;border:none;border-radius:50%;
 			background:<?php echo $accent; ?>;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
 		#mal-toggle:hover{opacity:.82}
-		#mal-replay{width:30px;height:30px;flex:0 0 30px;border:1px solid #d5d5d5;border-radius:50%;
-			background:#fff;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
-		#mal-replay:hover{opacity:.7}
 		.mal-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 		.mal-toprow{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 		.mal-label{font-weight:600;font-size:14px}
@@ -220,7 +214,6 @@ function mal_assets() {
 		if (!('speechSynthesis' in window)) { player.style.display = 'none'; return; }
 
 		var toggle   = document.getElementById('mal-toggle');
-		var replay   = document.getElementById('mal-replay');
 		var icPlay   = document.getElementById('mal-ic-play');
 		var icPause  = document.getElementById('mal-ic-pause');
 		var sub      = document.getElementById('mal-sub');
@@ -361,15 +354,6 @@ function mal_assets() {
 		seekEl.addEventListener('change', function () {
 			seeking = false;
 			seekTo(seekEl.value / 1000);
-		});
-
-		replay.addEventListener('click', function () {
-			idx = 0;
-			updateProgress();
-			speechSynthesis.cancel();
-			startKeepAlive();
-			setUI(true);
-			setTimeout(speakNext, 120);
 		});
 
 		function speakNext() {

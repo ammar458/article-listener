@@ -3,7 +3,7 @@ Contributors: ammar458
 Tags: text to speech, accessibility, audio, speech synthesis
 Requires at least: 5.0
 Tested up to: 6.6
-Stable tag: 1.8
+Stable tag: 1.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,9 +19,11 @@ Features:
 * Optional reading of the post title before the article body
 * Per-post on/off control from the post editor
 * Draggable progress bar and estimated listening time
-* Replay button to restart the article from the beginning
 
 == Changelog ==
+
+= 1.9 =
+* Removed the replay button.
 
 = 1.8 =
 * Fix: the replay button appeared as an empty circle with no visible icon, due to an invalid custom SVG path. Replaced with a standard replay icon.
