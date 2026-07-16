@@ -2,7 +2,7 @@
 /**
  * Plugin Name: My Article Listener
  * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, a draggable seek bar, a replay button, and per-post on/off control.
- * Version: 1.7
+ * Version: 1.8
  * Author: You
  * License: GPL-2.0+
  */
@@ -164,7 +164,7 @@ function mal_player_html( $content ) {
 			<svg id="mal-ic-pause" width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="display:none"><path d="M4 2h3v12H4zM9 2h3v12H9z"/></svg>
 		</button>
 		<button id="mal-replay" type="button" aria-label="Replay from start">
-			<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2.5a5.5 5.5 0 1 1-5.48 6h1.51a4 4 0 1 0 .17-2.83L5.5 7H2V3.5l1.4 1.4A5.48 5.48 0 0 1 8 2.5z"/></svg>
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
 		</button>
 		<div class="mal-mid">
 			<div class="mal-toprow">

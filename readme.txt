@@ -3,7 +3,7 @@ Contributors: ammar458
 Tags: text to speech, accessibility, audio, speech synthesis
 Requires at least: 5.0
 Tested up to: 6.6
-Stable tag: 1.7
+Stable tag: 1.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,9 @@ Features:
 * Replay button to restart the article from the beginning
 
 == Changelog ==
+
+= 1.8 =
+* Fix: the replay button appeared as an empty circle with no visible icon, due to an invalid custom SVG path. Replaced with a standard replay icon.
 
 = 1.7 =
 * Added: the progress bar is now a draggable seek control, so visitors can rewind or skip ahead. Since the browser speech engine can't seek mid-sentence, dragging jumps to the nearest ~200-character sentence group.
