@@ -2,7 +2,7 @@
 /**
  * Plugin Name: My Article Listener
  * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, voice picker, speed control, progress bar, and per-post on/off control.
- * Version: 1.3
+ * Version: 1.4
  * Author: You
  * License: GPL-2.0+
  */
@@ -231,17 +231,20 @@ function mal_assets() {
 
 		function getBodyText(root) {
 			var clone = root.cloneNode(true);
-			clone.querySelectorAll('#mal-player,script,style,figure,figcaption,iframe,form,nav,aside,h1,.wp-block-embed,.sharedaddy,.jp-relatedposts,.comments-area').forEach(function (el) { el.remove(); });
+			clone.querySelectorAll('#mal-player,script,style,figure,figcaption,iframe,form,nav,aside,h1,.wp-block-embed,.sharedaddy,.jp-relatedposts,.comments-area,.elementor-posts-container,.elementor-grid-item').forEach(function (el) { el.remove(); });
 			return (clone.innerText || clone.textContent || '').replace(/\s+/g, ' ').trim();
 		}
 
 		// Try the configured selector plus sensible fallbacks; if several elements match
 		// (e.g. a related-post teaser using the same class), keep whichever has the most
 		// text, since that's almost always the real article body.
-		var selectors = [<?php echo $sel; ?>, '.elementor-widget-theme-post-content .elementor-widget-container', '.entry-content', 'article', 'main'];
+		var selectors = [<?php echo $sel; ?>, '.elementor-widget-theme-post-content', '.elementor-widget-theme-post-content .elementor-widget-container', '.entry-content', 'article', 'main'];
 		var bodyText = '';
 		selectors.forEach(function (sel) {
 			document.querySelectorAll(sel).forEach(function (el) {
+				// Skip related-post / grid teaser cards - they match generic tags like
+				// "article" but are excerpts of OTHER posts, not this post's own content.
+				if (el.closest('.elementor-grid-item,.elementor-posts-container,.jp-relatedposts,.sharedaddy')) return;
 				var text = getBodyText(el);
 				if (text.length > bodyText.length) bodyText = text;
 			});
