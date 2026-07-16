@@ -2,7 +2,7 @@
 /**
  * Plugin Name: My Article Listener
  * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, voice picker, speed control, progress bar, and per-post on/off control.
- * Version: 1.4
+ * Version: 1.5
  * Author: You
  * License: GPL-2.0+
  */
@@ -260,6 +260,12 @@ function mal_assets() {
 		var fullText = (postTitle ? postTitle + '. ' : '') + bodyText;
 		fullText = fullText.trim();
 		if (!fullText) { player.style.display = 'none'; return; }
+
+		// Spell out short all-caps acronyms (SEO, PPC, ROI, ...) letter by letter instead
+		// of letting the speech engine guess at a pronunciation for the whole word.
+		fullText = fullText.replace(/\b[A-Z]{2,6}\b/g, function (acronym) {
+			return acronym.split('').join('.') + '.';
+		});
 
 		// Split into ~200 char sentence groups so long articles never get cut off
 		var parts = fullText.match(/[^.!?]+[.!?]+|\S[^.!?]*$/g) || [fullText];

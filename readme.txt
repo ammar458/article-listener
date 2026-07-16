@@ -3,7 +3,7 @@ Contributors: ammar458
 Tags: text to speech, accessibility, audio, speech synthesis
 Requires at least: 5.0
 Tested up to: 6.6
-Stable tag: 1.4
+Stable tag: 1.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,9 @@ Features:
 * Progress bar and estimated listening time
 
 == Changelog ==
+
+= 1.5 =
+* Improvement: short all-caps acronyms (SEO, PPC, ROI, etc.) are now spelled out letter by letter (e.g. "S.E.O.") instead of being read as if they were a single word.
 
 = 1.4 =
 * Fix: on pages with a "related posts" or "recent posts" grid widget (Elementor's Posts widget), the content-detection logic could pick a short excerpt from one of those teaser cards instead of the actual post body, since they also match generic selectors like `article`. Teaser/grid-item cards are now explicitly excluded from consideration.
