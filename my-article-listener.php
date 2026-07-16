@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: My Article Listener
- * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, voice picker, speed control, progress bar, and per-post on/off control.
- * Version: 1.5
+ * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, progress bar, and per-post on/off control.
+ * Version: 1.6
  * Author: You
  * License: GPL-2.0+
  */
@@ -171,16 +171,6 @@ function mal_player_html( $content ) {
 			<div class="mal-bar"><div class="mal-fill" id="mal-fill"></div></div>
 			<span class="mal-sub" id="mal-sub">' . esc_html( $o['sub_label'] ) . '</span>
 		</div>
-		<div class="mal-ctrls">
-			<select id="mal-voice" aria-label="Voice"></select>
-			<select id="mal-speed" aria-label="Playback speed">
-				<option value="0.8">0.8x</option>
-				<option value="1" selected>1x</option>
-				<option value="1.25">1.25x</option>
-				<option value="1.5">1.5x</option>
-				<option value="2">2x</option>
-			</select>
-		</div>
 	</div>';
 
 	return $player . $content;
@@ -210,9 +200,6 @@ function mal_assets() {
 		.mal-bar{height:4px;border-radius:2px;background:#e6e6e6;overflow:hidden}
 		.mal-fill{height:100%;width:0;background:<?php echo $accent; ?>;transition:width .4s linear}
 		.mal-sub{font-size:11.5px;color:#8a8a8a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-		.mal-ctrls{display:flex;flex-direction:column;gap:6px}
-		.mal-ctrls select{border:1px solid #d5d5d5;border-radius:7px;padding:3px 5px;font-size:12px;background:#fff;cursor:pointer;max-width:120px}
-		@media (max-width:480px){.mal-ctrls{flex-direction:row}#mal-voice{max-width:90px}}
 	</style>
 	<script>
 	document.addEventListener('DOMContentLoaded', function () {
@@ -226,8 +213,6 @@ function mal_assets() {
 		var sub     = document.getElementById('mal-sub');
 		var fill    = document.getElementById('mal-fill');
 		var timeEl  = document.getElementById('mal-time');
-		var speedEl = document.getElementById('mal-speed');
-		var voiceEl = document.getElementById('mal-voice');
 
 		function getBodyText(root) {
 			var clone = root.cloneNode(true);
@@ -301,29 +286,18 @@ function mal_assets() {
 		}
 		timeEl.textContent = estMinutes();
 
+		// Always use the "Mark" voice if the visitor's browser/OS provides one, falling
+		// back to a voice matching the page language, then whatever voice is first.
 		function loadVoices() {
 			var voices = speechSynthesis.getVoices();
 			if (!voices.length) return;
 			var docLang = (document.documentElement.lang || 'en').slice(0, 2).toLowerCase();
-			var matching = voices.filter(function (v) { return v.lang.slice(0, 2).toLowerCase() === docLang; });
-			var list = matching.length ? matching : voices;
-			voiceEl.innerHTML = '';
-			list.forEach(function (v) {
-				var op = document.createElement('option');
-				op.value = v.name;
-				op.textContent = v.name.replace(/(Microsoft|Google)\s*/i, '').split(' ')[0] + ' (' + v.lang + ')';
-				voiceEl.appendChild(op);
-			});
-			chosenVoice = list[0] || null;
+			chosenVoice = voices.find(function (v) { return /mark/i.test(v.name); } )
+				|| voices.find(function (v) { return v.lang.slice(0, 2).toLowerCase() === docLang; })
+				|| voices[0];
 		}
 		loadVoices();
 		speechSynthesis.onvoiceschanged = loadVoices;
-
-		voiceEl.addEventListener('change', function () {
-			var voices = speechSynthesis.getVoices();
-			chosenVoice = voices.find(function (v) { return v.name === voiceEl.value; }) || null;
-			if (playing) restart();
-		});
 
 		function setUI(isPlaying, msg) {
 			playing = isPlaying;
@@ -370,18 +344,12 @@ function mal_assets() {
 			u.onerror = function (e) {
 				if (e.error === 'interrupted' || e.error === 'canceled') return;
 				stopKeepAlive();
-				setUI(false, 'Playback error. Try another voice.');
+				setUI(false, 'Playback error. Please try again.');
 			};
 
 			currentU = u; // keep reference alive
 			speechSynthesis.speak(u);
 			sub.textContent = 'Now playing';
-		}
-
-		// Chrome can silently ignore speak() called right after cancel(); a short delay avoids that
-		function restart() {
-			speechSynthesis.cancel();
-			setTimeout(function () { if (playing) speakNext(); }, 120);
 		}
 
 		toggle.addEventListener('click', function () {
@@ -396,12 +364,6 @@ function mal_assets() {
 				startKeepAlive();
 				setTimeout(speakNext, 120);
 			}
-		});
-
-		speedEl.addEventListener('change', function () {
-			rate = parseFloat(speedEl.value);
-			timeEl.textContent = estMinutes();
-			if (playing) restart();
 		});
 
 		window.addEventListener('beforeunload', function () { speechSynthesis.cancel(); });

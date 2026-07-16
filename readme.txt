@@ -3,7 +3,7 @@ Contributors: ammar458
 Tags: text to speech, accessibility, audio, speech synthesis
 Requires at least: 5.0
 Tested up to: 6.6
-Stable tag: 1.5
+Stable tag: 1.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,10 +18,12 @@ Features:
 * Settings page with label, sub-label, and accent color
 * Optional reading of the post title before the article body
 * Per-post on/off control from the post editor
-* Voice picker and playback speed control
 * Progress bar and estimated listening time
 
 == Changelog ==
+
+= 1.6 =
+* Changed: removed the voice picker and playback speed dropdowns. The player now always uses the "Mark" voice when the visitor's browser/OS provides one (falling back to a voice matching the page language, then the first available voice), at a fixed 1x speed.
 
 = 1.5 =
 * Improvement: short all-caps acronyms (SEO, PPC, ROI, etc.) are now spelled out letter by letter (e.g. "S.E.O.") instead of being read as if they were a single word.
