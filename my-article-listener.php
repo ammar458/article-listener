@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: My Article Listener
- * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, progress bar, and per-post on/off control.
- * Version: 1.6
+ * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, a draggable seek bar, a replay button, and per-post on/off control.
+ * Version: 1.7
  * Author: You
  * License: GPL-2.0+
  */
@@ -163,12 +163,15 @@ function mal_player_html( $content ) {
 			<svg id="mal-ic-play" width="15" height="15" viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5v11l9-5.5-9-5.5z"/></svg>
 			<svg id="mal-ic-pause" width="15" height="15" viewBox="0 0 16 16" fill="currentColor" style="display:none"><path d="M4 2h3v12H4zM9 2h3v12H9z"/></svg>
 		</button>
+		<button id="mal-replay" type="button" aria-label="Replay from start">
+			<svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 2.5a5.5 5.5 0 1 1-5.48 6h1.51a4 4 0 1 0 .17-2.83L5.5 7H2V3.5l1.4 1.4A5.48 5.48 0 0 1 8 2.5z"/></svg>
+		</button>
 		<div class="mal-mid">
 			<div class="mal-toprow">
 				<span class="mal-label">' . esc_html( $o['label'] ) . '</span>
 				<span class="mal-time" id="mal-time"></span>
 			</div>
-			<div class="mal-bar"><div class="mal-fill" id="mal-fill"></div></div>
+			<input type="range" id="mal-seek" class="mal-bar" min="0" max="1000" value="0" step="1" aria-label="Seek">
 			<span class="mal-sub" id="mal-sub">' . esc_html( $o['sub_label'] ) . '</span>
 		</div>
 	</div>';
@@ -193,12 +196,21 @@ function mal_assets() {
 		#mal-toggle{width:44px;height:44px;flex:0 0 44px;border:none;border-radius:50%;
 			background:<?php echo $accent; ?>;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
 		#mal-toggle:hover{opacity:.82}
+		#mal-replay{width:30px;height:30px;flex:0 0 30px;border:1px solid #d5d5d5;border-radius:50%;
+			background:#fff;color:#555;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+		#mal-replay:hover{opacity:.7}
 		.mal-mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
 		.mal-toprow{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 		.mal-label{font-weight:600;font-size:14px}
 		.mal-time{font-size:11px;color:#888;white-space:nowrap}
-		.mal-bar{height:4px;border-radius:2px;background:#e6e6e6;overflow:hidden}
-		.mal-fill{height:100%;width:0;background:<?php echo $accent; ?>;transition:width .4s linear}
+		.mal-bar{-webkit-appearance:none;appearance:none;width:100%;height:4px;border-radius:2px;
+			background:#e6e6e6;outline:none;cursor:pointer;margin:0}
+		.mal-bar::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:transparent}
+		.mal-bar::-moz-range-track{height:4px;border-radius:2px;background:transparent}
+		.mal-bar::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:12px;height:12px;
+			border-radius:50%;background:<?php echo $accent; ?>;cursor:pointer;margin-top:-4px}
+		.mal-bar::-moz-range-thumb{width:12px;height:12px;border:none;border-radius:50%;
+			background:<?php echo $accent; ?>;cursor:pointer}
 		.mal-sub{font-size:11.5px;color:#8a8a8a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 	</style>
 	<script>
@@ -207,12 +219,15 @@ function mal_assets() {
 		if (!player) return;
 		if (!('speechSynthesis' in window)) { player.style.display = 'none'; return; }
 
-		var toggle  = document.getElementById('mal-toggle');
-		var icPlay  = document.getElementById('mal-ic-play');
-		var icPause = document.getElementById('mal-ic-pause');
-		var sub     = document.getElementById('mal-sub');
-		var fill    = document.getElementById('mal-fill');
-		var timeEl  = document.getElementById('mal-time');
+		var toggle   = document.getElementById('mal-toggle');
+		var replay   = document.getElementById('mal-replay');
+		var icPlay   = document.getElementById('mal-ic-play');
+		var icPause  = document.getElementById('mal-ic-pause');
+		var sub      = document.getElementById('mal-sub');
+		var seekEl   = document.getElementById('mal-seek');
+		var timeEl   = document.getElementById('mal-time');
+		var accent   = <?php echo wp_json_encode( $o['accent'] ); ?>;
+		var seeking  = false; // true while the visitor is actively dragging the seek bar
 
 		function getBodyText(root) {
 			var clone = root.cloneNode(true);
@@ -306,16 +321,61 @@ function mal_assets() {
 			if (msg) sub.textContent = msg;
 		}
 
+		// Paints the seek bar's fill without moving its handle while the visitor is
+		// actively dragging it (that's handled separately by the 'input' listener).
+		function setSeekVisual(pct) {
+			pct = Math.max(0, Math.min(100, pct));
+			seekEl.value = Math.round(pct * 10);
+			seekEl.style.background = 'linear-gradient(to right, ' + accent + ' ' + pct + '%, #e6e6e6 ' + pct + '%)';
+		}
+
 		function updateProgress() {
+			if (seeking) return;
 			var done = 0;
 			for (var i = 0; i < idx; i++) done += groups[i].length;
-			fill.style.width = Math.min(100, Math.round((done / totalChars) * 100)) + '%';
+			setSeekVisual((done / totalChars) * 100);
 		}
+		setSeekVisual(0);
+
+		// Jump playback to the sentence-group nearest the given position (0-1). The
+		// speech engine can't seek mid-utterance, so this is the finest resolution available.
+		function seekTo(fraction) {
+			var targetChar = Math.max(0, Math.min(totalChars, Math.round(fraction * totalChars)));
+			var cum = 0, newIdx = groups.length - 1;
+			for (var i = 0; i < groups.length; i++) {
+				cum += groups[i].length;
+				if (cum > targetChar) { newIdx = i; break; }
+			}
+			idx = newIdx;
+			updateProgress();
+			if (playing) {
+				speechSynthesis.cancel();
+				setTimeout(speakNext, 120);
+			}
+		}
+
+		seekEl.addEventListener('input', function () {
+			seeking = true;
+			setSeekVisual(seekEl.value / 10);
+		});
+		seekEl.addEventListener('change', function () {
+			seeking = false;
+			seekTo(seekEl.value / 1000);
+		});
+
+		replay.addEventListener('click', function () {
+			idx = 0;
+			updateProgress();
+			speechSynthesis.cancel();
+			startKeepAlive();
+			setUI(true);
+			setTimeout(speakNext, 120);
+		});
 
 		function speakNext() {
 			if (idx >= groups.length) {
 				idx = 0;
-				fill.style.width = '100%';
+				setSeekVisual(100);
 				stopKeepAlive();
 				setUI(false, 'Finished. Tap play to listen again.');
 				return;

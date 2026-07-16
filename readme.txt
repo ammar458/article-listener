@@ -3,7 +3,7 @@ Contributors: ammar458
 Tags: text to speech, accessibility, audio, speech synthesis
 Requires at least: 5.0
 Tested up to: 6.6
-Stable tag: 1.6
+Stable tag: 1.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,9 +18,14 @@ Features:
 * Settings page with label, sub-label, and accent color
 * Optional reading of the post title before the article body
 * Per-post on/off control from the post editor
-* Progress bar and estimated listening time
+* Draggable progress bar and estimated listening time
+* Replay button to restart the article from the beginning
 
 == Changelog ==
+
+= 1.7 =
+* Added: the progress bar is now a draggable seek control, so visitors can rewind or skip ahead. Since the browser speech engine can't seek mid-sentence, dragging jumps to the nearest ~200-character sentence group.
+* Added: a replay button that restarts the article from the beginning at any point during playback.
 
 = 1.6 =
 * Changed: removed the voice picker and playback speed dropdowns. The player now always uses the "Mark" voice when the visitor's browser/OS provides one (falling back to a voice matching the page language, then the first available voice), at a fixed 1x speed.
