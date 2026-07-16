@@ -2,7 +2,7 @@
 /**
  * Plugin Name: My Article Listener
  * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, voice picker, speed control, progress bar, and per-post on/off control.
- * Version: 1.2
+ * Version: 1.3
  * Author: You
  * License: GPL-2.0+
  */
@@ -235,13 +235,17 @@ function mal_assets() {
 			return (clone.innerText || clone.textContent || '').replace(/\s+/g, ' ').trim();
 		}
 
-		// Try the configured selector first, then sensible fallbacks
+		// Try the configured selector plus sensible fallbacks; if several elements match
+		// (e.g. a related-post teaser using the same class), keep whichever has the most
+		// text, since that's almost always the real article body.
 		var selectors = [<?php echo $sel; ?>, '.elementor-widget-theme-post-content .elementor-widget-container', '.entry-content', 'article', 'main'];
 		var bodyText = '';
-		for (var s = 0; s < selectors.length && !bodyText; s++) {
-			var el = document.querySelector(selectors[s]);
-			if (el) bodyText = getBodyText(el);
-		}
+		selectors.forEach(function (sel) {
+			document.querySelectorAll(sel).forEach(function (el) {
+				var text = getBodyText(el);
+				if (text.length > bodyText.length) bodyText = text;
+			});
+		});
 
 		// Read the page's H1 as the title. Falls back to the WordPress post title.
 		var readTitle = <?php echo $o['read_title'] ? 'true' : 'false'; ?>;

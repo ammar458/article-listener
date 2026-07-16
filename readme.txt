@@ -3,7 +3,7 @@ Contributors: ammar458
 Tags: text to speech, accessibility, audio, speech synthesis
 Requires at least: 5.0
 Tested up to: 6.6
-Stable tag: 1.2
+Stable tag: 1.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -22,6 +22,9 @@ Features:
 * Progress bar and estimated listening time
 
 == Changelog ==
+
+= 1.3 =
+* Fix: the player could end up reading only the post title when multiple elements on the page matched the content selector (e.g. a related-post teaser with the same class as the article wrapper). It now checks every matching element and uses whichever contains the most text.
 
 = 1.2 =
 * Current release.
