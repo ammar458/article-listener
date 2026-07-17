@@ -3,7 +3,7 @@ Contributors: ammar458
 Tags: text to speech, accessibility, audio, speech synthesis
 Requires at least: 5.0
 Tested up to: 6.6
-Stable tag: 1.9
+Stable tag: 2.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,6 +21,9 @@ Features:
 * Draggable progress bar and estimated listening time
 
 == Changelog ==
+
+= 2.0 =
+* Changed: the auto-updater now points at https://github.com/ringomedia-code/article-listener (repo ownership is moving there). Sites should update to this version before the old repo location stops resolving.
 
 = 1.9 =
 * Removed the replay button.

@@ -2,7 +2,7 @@
 /**
  * Plugin Name: My Article Listener
  * Description: Your own free "Listen to this article" player. Uses the browser's built-in speech engine, so there are no fees, no accounts, and no monthly limits. Includes a settings page, a draggable seek bar, and per-post on/off control.
- * Version: 1.9
+ * Version: 2.0
  * Author: You
  * License: GPL-2.0+
  */
@@ -17,7 +17,7 @@ require_once __DIR__ . '/vendor/plugin-update-checker/plugin-update-checker.php'
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $mal_update_checker = PucFactory::buildUpdateChecker(
-	'https://github.com/ammar458/article-listener/',
+	'https://github.com/ringomedia-code/article-listener/',
 	__FILE__,
 	'my-article-listener'
 );

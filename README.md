@@ -4,7 +4,7 @@ A free "Listen to this article" player for WordPress. Uses the browser's built-i
 
 ## Installation
 
-1. Download the latest release zip from the [Releases](https://github.com/ammar458/article-listener/releases) page.
+1. Download the latest release zip from the [Releases](https://github.com/ringomedia-code/article-listener/releases) page.
 2. In WordPress, go to **Plugins → Add New → Upload Plugin** and upload the zip.
 3. Activate the plugin, then visit **Settings → Article Listener** to configure it.
 
@@ -15,6 +15,6 @@ This plugin checks this GitHub repository for new releases and can be updated di
 To ship an update:
 1. Bump the `Version` header in `my-article-listener.php`.
 2. Commit and push to `main`.
-3. Create a new [GitHub Release](https://github.com/ammar458/article-listener/releases/new) with a tag matching the version (e.g. `v1.3`).
+3. Create a new [GitHub Release](https://github.com/ringomedia-code/article-listener/releases/new) with a tag matching the version (e.g. `v1.3`).
 
 Sites running the plugin will see the update in **Dashboard → Updates** shortly after.
